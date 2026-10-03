@@ -86,6 +86,7 @@ a.b{display:block;text-align:center;text-decoration:none;padding:14px;border-rad
     <button class="b alt" id="bsh">Compartir link de demostración</button>
   </div>
   <div id="msg" role="status"></div>
+  <p class="hlp" id="lenhint"></p>
 
   <div class="ptitle">Código QR</div>
   <div id="qrbox"></div>
@@ -103,6 +104,31 @@ var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':
 var enc=function(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o))))};
 var dec=function(s){return JSON.parse(decodeURIComponent(escape(atob(s))))};
 var FIELDS=['n','t','g','ig','tt','fb','wa','web','ph','mp','c','gc'];
+function strip(v,re){var m=v.match(re);return m?m[1]:v;}
+function pack(o){
+  var vals=FIELDS.map(function(k){
+    var v=(o[k]||'').trim(); if(!v) return '';
+    var url=/^https?:\/\//i.test(v);
+    if(k==='c') v=v.replace('#','');
+    else if(k==='ig') v=strip(v,/^https?:\/\/(?:www\.)?instagram\.com\/@?([^\/?#]+)\/?(?:[?#].*)?$/i).replace(/^@/,'');
+    else if(k==='tt') v=strip(v,/^https?:\/\/(?:www\.)?tiktok\.com\/@([^\/?#]+)\/?(?:[?#].*)?$/i).replace(/^@/,'');
+    else if(k==='fb') v=strip(v,/^https?:\/\/(?:www\.)?facebook\.com\/([^\/?#]+)\/?$/i);
+    else if(k==='web') v=v.replace(/^https:\/\//i,'').replace(/\/$/,'');
+    else if((k==='wa')&&!url) v=v.replace(/\D/g,'');
+    else if((k==='ph')&&!url) v=v.replace(/[^\d+]/g,'');
+    return encodeURIComponent(v).replace(/~/g,'%7E');
+  });
+  while(vals.length&&!vals[vals.length-1]) vals.pop();
+  return vals.join('~');
+}
+function unpack(s){
+  var p=s.split('~'),o={};
+  FIELDS.forEach(function(k,i){
+    var v=p[i]?decodeURIComponent(p[i]):'';
+    if(v){ if(k==='c') v='#'+v; o[k]=v; }
+  });
+  return o;
+}
 
 function link(k,v){
   v=(v||'').trim(); if(!v) return '';
@@ -159,6 +185,7 @@ function render(cfg,el,live){
 
 var cfg=null;
 try{var t=$('#cfg').textContent.trim(); if(t) cfg=JSON.parse(t);}catch(e){}
+if(!cfg && /^#p=/.test(location.hash)){ try{cfg=unpack(location.hash.slice(3));}catch(e){} }
 if(!cfg && /^#d=/.test(location.hash)){ try{cfg=dec(location.hash.slice(3));}catch(e){} }
 
 if(cfg){
@@ -171,7 +198,7 @@ if(cfg){
 /* ---- Modo creador ---- */
 var msg=function(t){$('#msg').textContent=t;};
 function read(){var o={};FIELDS.forEach(function(k){var v=$('#'+k).value.trim(); if(v) o[k]=v;});return o;}
-function demoLink(o){return location.href.split('#')[0]+'#d='+enc(o);}
+function demoLink(o){return location.href.split('#')[0]+'#p='+pack(o);}
 function drawQR(url){
   var box=$('#qrbox');
   try{
@@ -194,7 +221,13 @@ function update(){
   clearTimeout(timer);
   timer=setTimeout(function(){
     var fu=$('#fu').value.trim();
-    drawQR(fu||demoLink(o));
+    var fl=fu||demoLink(o);
+    drawQR(fl);
+    var n=fl.length,h=n+' caracteres. ';
+    if(n<=130) h+='Cabe en cualquier tarjeta NFC (NTAG213 o mayor).';
+    else if(n<=490) h+='Necesitas tarjeta NTAG215 o NTAG216, o <a href="https://is.gd" target="_blank" rel="noopener">acorta el link en is.gd</a> (queda de unos 20 caracteres y cabe en cualquier tarjeta).';
+    else h+='Es demasiado largo para casi todas las tarjetas: <a href="https://is.gd" target="_blank" rel="noopener">acórtalo en is.gd</a> antes de grabarlo.';
+    $('#lenhint').innerHTML=h;
   },250);
 }
 FIELDS.concat(['fu']).forEach(function(k){$('#'+k).addEventListener('input',update);});
