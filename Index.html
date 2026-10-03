@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Creador de páginas NFC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script id="cfg" type="application/json"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+:root{--bg:#f6f5f2;--fg:#1d1d1b;--mut:#6b6a66;--line:#dcdad4;--card:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;--fg:#f1f0ec;--mut:#a09f9a;--line:#33322f;--card:#202020}}
+:root[data-theme="dark"]{--bg:#161615;--fg:#f1f0ec;--mut:#a09f9a;--line:#33322f;--card:#202020}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 16px/1.45 Outfit,system-ui,sans-serif}
+#gen{max-width:520px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:26px;font-weight:800;margin:0 0 4px}
+.sub{color:var(--mut);margin:0 0 18px}
+.f{display:block;margin:0 0 12px}
+.f span{display:block;font-size:14px;color:var(--mut);margin-bottom:4px}
+.f input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg);font:inherit}
+.f input:focus,button:focus-visible,a:focus-visible{outline:3px solid #2f7bff;outline-offset:2px}
+.f input[type=color]{padding:2px;height:46px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.acts{display:grid;gap:10px;margin:18px 0}
+button.b{padding:14px;border:0;border-radius:12px;font:700 16px Outfit,system-ui,sans-serif;background:var(--fg);color:var(--bg);cursor:pointer}
+button.b.alt{background:transparent;color:var(--fg);border:1.5px solid var(--line)}
+#msg{min-height:20px;color:var(--mut);font-size:14px}
+#qrbox{text-align:center;margin:10px 0}
+#qrbox img{width:200px;height:200px;image-rendering:pixelated;background:#fff;padding:10px;border-radius:12px}
+.prev{margin-top:22px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--bg)}
+.ptitle{margin:26px 0 8px;font-weight:700}
+/* Página del cliente */
+#app{--ac:#111}
+.pg{max-width:440px;margin:0 auto;padding:36px 20px 40px;text-align:center}
+.pg h2{font-size:30px;font-weight:800;line-height:1.1;margin:0 0 8px;letter-spacing:-.01em}
+.pg p.t{color:var(--mut);margin:0 0 26px}
+.cta{display:block;text-decoration:none;background:var(--ac);color:var(--on,#fff);border-radius:18px;padding:22px 16px;margin-bottom:22px}
+.cta b{display:block;font-size:21px;font-weight:800}
+.cta i{display:block;font-style:normal;letter-spacing:5px;font-size:22px;margin-bottom:6px}
+.cta small{opacity:.85;font-size:14px}
+.lk{display:flex;align-items:center;gap:14px;text-align:left;text-decoration:none;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px;font-weight:500}
+.lk em{flex:none;width:38px;height:38px;border-radius:50%;background:var(--ac);color:var(--on,#fff);display:grid;place-items:center;font:800 14px Outfit,sans-serif;font-style:normal}
+</style>
+</head>
+<body>
+<div id="gen">
+  <h1>Creador de páginas NFC</h1>
+  <p class="sub">Llena los datos del negocio, muéstrale la vista previa y descarga su página.</p>
+  <label class="f"><span>Nombre del negocio</span><input id="n" placeholder="Barbería Estilo Latino"></label>
+  <label class="f"><span>Frase corta (opcional)</span><input id="t" placeholder="Gracias por visitarnos"></label>
+  <label class="f"><span>Enlace de reseñas de Google (link completo o Place ID)</span><input id="g" placeholder="https://g.page/r/... o ChIJ..."></label>
+  <div class="row">
+    <label class="f"><span>Instagram</span><input id="ig" placeholder="@usuario"></label>
+    <label class="f"><span>TikTok</span><input id="tt" placeholder="@usuario"></label>
+    <label class="f"><span>Facebook</span><input id="fb" placeholder="usuario o link"></label>
+    <label class="f"><span>WhatsApp</span><input id="wa" inputmode="tel" placeholder="56912345678"></label>
+    <label class="f"><span>Sitio web</span><input id="web" placeholder="minegocio.cl"></label>
+    <label class="f"><span>Teléfono</span><input id="ph" inputmode="tel" placeholder="+56 9 1234 5678"></label>
+  </div>
+  <label class="f"><span>Link de Google Maps (cómo llegar)</span><input id="mp" placeholder="https://maps.app.goo.gl/..."></label>
+  <label class="f"><span>Color del negocio</span><input id="c" type="color" value="#d4382c"></label>
+  <label class="f"><span>Código GoatCounter para contar visitas (opcional)</span><input id="gc" placeholder="minegocio"></label>
+  <label class="f"><span>URL final de la página, cuando ya esté publicada (para el QR)</span><input id="fu" inputmode="url" placeholder="https://minegocio.netlify.app"></label>
+
+  <div class="acts">
+    <button class="b" id="bdl">Descargar página del cliente (.html)</button>
+    <button class="b alt" id="bcp">Copiar link de demostración</button>
+    <button class="b alt" id="bsh">Compartir link de demostración</button>
+  </div>
+  <div id="msg" role="status"></div>
+
+  <div class="ptitle">Código QR</div>
+  <div id="qrbox"></div>
+  <button class="b alt" id="bqr" style="width:100%">Descargar QR (.png)</button>
+
+  <div class="ptitle">Vista previa</div>
+  <div class="prev" id="pv"></div>
+</div>
+<div id="app"></div>
+
+<script>
+(function(){
+var $=function(s){return document.querySelector(s)};
+var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var enc=function(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o))))};
+var dec=function(s){return JSON.parse(decodeURIComponent(escape(atob(s))))};
+var FIELDS=['n','t','g','ig','tt','fb','wa','web','ph','mp','c','gc'];
+
+function link(k,v){
+  v=(v||'').trim(); if(!v) return '';
+  if(/^https?:\/\//i.test(v)) return v;
+  v=v.replace(/^@/,'');
+  if(k==='ig') return 'https://instagram.com/'+v;
+  if(k==='tt') return 'https://tiktok.com/@'+v;
+  if(k==='fb') return 'https://facebook.com/'+v;
+  if(k==='wa') return 'https://wa.me/'+v.replace(/\D/g,'');
+  if(k==='ph') return 'tel:'+v.replace(/[^\d+]/g,'');
+  if(k==='g') return 'https://search.google.com/local/writereview?placeid='+encodeURIComponent(v);
+  return 'https://'+v;
+}
+function onColor(hex){
+  var h=(hex||'#111111').replace('#','');
+  var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);
+  return (0.299*r+0.587*g+0.114*b)>160?'#111':'#fff';
+}
+function render(cfg,el,live){
+  var ac=cfg.c||'#d4382c';
+  el.style.setProperty('--ac',ac);
+  el.style.setProperty('--on',onColor(ac));
+  var rows=[['ig','Instagram','IG'],['tt','TikTok','TT'],['fb','Facebook','FB'],['wa','WhatsApp','WA'],['web','Sitio web','WW'],['mp','Cómo llegar','GO'],['ph','Llamar','TL']];
+  var h='<div class="pg"><h2>'+esc(cfg.n||'Nombre del negocio')+'</h2><p class="t">'+esc(cfg.t||'Gracias por visitarnos')+'</p>';
+  var g=link('g',cfg.g);
+  if(g) h+='<a class="cta" href="'+esc(g)+'"><i aria-hidden="true">★★★★★</i><b>Déjanos tu reseña en Google</b><small>Toma menos de un minuto</small></a>';
+  rows.forEach(function(r){
+    var u=link(r[0],cfg[r[0]]);
+    if(u) h+='<a class="lk" href="'+esc(u)+'"><em aria-hidden="true">'+r[2]+'</em><span>'+r[1]+'</span></a>';
+  });
+  el.innerHTML=h+'</div>';
+  if(!live && cfg.gc){
+    var s=document.createElement('script');
+    s.async=true;s.src='https://gc.zgo.at/count.js';
+    s.setAttribute('data-goatcounter','https://'+cfg.gc.replace(/[^a-z0-9-]/gi,'')+'.goatcounter.com/count');
+    document.head.appendChild(s);
+  }
+}
+
+var cfg=null;
+try{var t=$('#cfg').textContent.trim(); if(t) cfg=JSON.parse(t);}catch(e){}
+if(!cfg && /^#d=/.test(location.hash)){ try{cfg=dec(location.hash.slice(3));}catch(e){} }
+
+if(cfg){
+  document.title=cfg.n||'Página del negocio';
+  var gn=$('#gen'); if(gn) gn.style.display='none';
+  render(cfg,$('#app'),false);
+  return;
+}
+
+/* ---- Modo creador ---- */
+var msg=function(t){$('#msg').textContent=t;};
+function read(){var o={};FIELDS.forEach(function(k){var v=$('#'+k).value.trim(); if(v) o[k]=v;});return o;}
+function demoLink(o){return location.href.split('#')[0]+'#d='+enc(o);}
+function drawQR(url){
+  var box=$('#qrbox');
+  try{
+    var q=qrcode(0,'M'); q.addData(url); q.make();
+    box.innerHTML='<img alt="Código QR" src="'+q.createDataURL(6,4)+'">';
+    $('#bqr').style.display='';
+  }catch(e){
+    box.textContent='El link es muy largo para un QR. Publica la página y escribe su URL final arriba.';
+    $('#bqr').style.display='none';
+  }
+}
+var timer;
+function update(){
+  var o=read();
+  render(o,$('#pv'),true);
+  clearTimeout(timer);
+  timer=setTimeout(function(){
+    var fu=$('#fu').value.trim();
+    drawQR(fu||demoLink(o));
+  },250);
+}
+FIELDS.concat(['fu']).forEach(function(k){$('#'+k).addEventListener('input',update);});
+
+$('#bdl').onclick=function(){
+  var o=read();
+  if(!o.n){msg('Escribe primero el nombre del negocio.');return;}
+  var c=document.documentElement.cloneNode(true);
+  c.querySelector('body').innerHTML='<div id="app"></div>';
+  c.querySelector('#cfg').textContent=JSON.stringify(o).replace(/</g,'\\u003c');
+  var html='<!DOCTYPE html>\n'+c.outerHTML;
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));
+  a.download=(o.n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'pagina')+'.html';
+  document.body.appendChild(a);a.click();a.remove();
+  msg('Descargada. Súbela a Netlify o Cloudflare Pages como index.html.');
+};
+$('#bcp').onclick=function(){
+  var u=demoLink(read());
+  (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){msg('Link copiado.');},function(){window.prompt('Copia el link:',u);});
+};
+$('#bsh').onclick=function(){
+  var u=demoLink(read());
+  if(navigator.share){navigator.share({title:read().n||'Página',url:u}).catch(function(){});}
+  else{window.prompt('Copia el link:',u);}
+};
+$('#bqr').onclick=function(){
+  var img=$('#qrbox img'); if(!img) return;
+  var a=document.createElement('a'); a.href=img.src; a.download='qr.png';
+  document.body.appendChild(a);a.click();a.remove();
+};
+update();
+})();
+</script>
+</body>
+</html>
