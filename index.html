@@ -31,19 +31,27 @@ button.b.alt{background:transparent;color:var(--fg);border:1.5px solid var(--lin
 #msg{min-height:20px;color:var(--mut);font-size:14px}
 #qrbox{text-align:center;margin:10px 0}
 #qrbox img{width:200px;height:200px;image-rendering:pixelated;background:#fff;padding:10px;border-radius:12px}
+.hlp{font-size:13px;color:var(--mut);margin:-4px 0 12px}
+.hlp a{color:inherit;text-decoration:underline}
+.gbox{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:12px;margin:0 0 14px}
+.gbox[hidden]{display:none}
+.gbox span{display:block;font-size:13px;color:var(--mut);margin-bottom:6px}
+.gbox code{display:block;font:13px/1.35 ui-monospace,Menlo,monospace;word-break:break-all;margin-bottom:10px}
+.gact{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+a.b{display:block;text-align:center;text-decoration:none;padding:14px;border-radius:12px;font:700 16px Outfit,system-ui,sans-serif;color:var(--fg);border:1.5px solid var(--line)}
 .prev{margin-top:22px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--bg)}
 .ptitle{margin:26px 0 8px;font-weight:700}
 /* Página del cliente */
 #app{--ac:#111}
 .pg{max-width:440px;margin:0 auto;padding:36px 20px 40px;text-align:center}
-.pg h2{font-size:30px;font-weight:800;line-height:1.1;margin:0 0 8px;letter-spacing:-.01em}
-.pg p.t{color:var(--mut);margin:0 0 26px}
-.cta{display:block;text-decoration:none;background:var(--ac);color:var(--on,#fff);border-radius:18px;padding:22px 16px;margin-bottom:22px}
+.pg h2{font-size:30px;font-weight:800;line-height:1.1;margin:0 0 8px;letter-spacing:-.01em;color:var(--on,#fff)}
+.pg p.t{color:var(--on,#fff);opacity:.85;margin:0 0 26px}
+.cta{display:block;text-decoration:none;background:#fff;color:#1d1d1b;border-radius:18px;padding:22px 16px;margin-bottom:22px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
 .cta b{display:block;font-size:21px;font-weight:800}
-.cta i{display:block;font-style:normal;letter-spacing:5px;font-size:22px;margin-bottom:6px}
-.cta small{opacity:.85;font-size:14px}
-.lk{display:flex;align-items:center;gap:14px;text-align:left;text-decoration:none;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px;font-weight:500}
-.lk em{flex:none;width:38px;height:38px;border-radius:50%;background:var(--ac);color:var(--on,#fff);display:grid;place-items:center;font:800 14px Outfit,sans-serif;font-style:normal}
+.cta i{display:block;font-style:normal;letter-spacing:5px;font-size:24px;margin-bottom:6px;color:#FBBC04}
+.cta small{color:#6b6a66;font-size:14px}
+.lk{display:flex;align-items:center;gap:14px;text-align:left;text-decoration:none;color:#1d1d1b;background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;font-weight:600;box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.lk svg{flex:none;width:40px;height:40px;display:block}
 </style>
 </head>
 <body>
@@ -52,7 +60,13 @@ button.b.alt{background:transparent;color:var(--fg);border:1.5px solid var(--lin
   <p class="sub">Llena los datos del negocio, muéstrale la vista previa y descarga su página.</p>
   <label class="f"><span>Nombre del negocio</span><input id="n" placeholder="Barbería Estilo Latino"></label>
   <label class="f"><span>Frase corta (opcional)</span><input id="t" placeholder="Gracias por visitarnos"></label>
-  <label class="f"><span>Enlace de reseñas de Google (link completo o Place ID)</span><input id="g" placeholder="https://g.page/r/... o ChIJ..."></label>
+  <label class="f"><span>Place ID de Google (o link de reseñas completo)</span><input id="g" placeholder="ChIJ... o https://g.page/r/..."></label>
+  <p class="hlp">¿No tienes el Place ID? <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" rel="noopener">Ábrelo en Place ID Finder</a>, escribe el nombre del negocio y copia el ID que empieza con <b>ChIJ</b>.</p>
+  <div class="gbox" id="gbox" hidden>
+    <span>Link de reseñas generado</span>
+    <code id="gout"></code>
+    <div class="gact"><button type="button" class="b alt" id="gcp">Copiar</button><a class="b alt" id="gts" target="_blank" rel="noopener">Probar</a></div>
+  </div>
   <div class="row">
     <label class="f"><span>Instagram</span><input id="ig" placeholder="@usuario"></label>
     <label class="f"><span>TikTok</span><input id="tt" placeholder="@usuario"></label>
@@ -62,7 +76,7 @@ button.b.alt{background:transparent;color:var(--fg);border:1.5px solid var(--lin
     <label class="f"><span>Teléfono</span><input id="ph" inputmode="tel" placeholder="+56 9 1234 5678"></label>
   </div>
   <label class="f"><span>Link de Google Maps (cómo llegar)</span><input id="mp" placeholder="https://maps.app.goo.gl/..."></label>
-  <label class="f"><span>Color del negocio</span><input id="c" type="color" value="#d4382c"></label>
+  <label class="f"><span>Color de fondo de la página</span><input id="c" type="color" value="#d4382c"></label>
   <label class="f"><span>Código GoatCounter para contar visitas (opcional)</span><input id="gc" placeholder="minegocio"></label>
   <label class="f"><span>URL final de la página, cuando ya esté publicada (para el QR)</span><input id="fu" inputmode="url" placeholder="https://minegocio.netlify.app"></label>
 
@@ -107,24 +121,39 @@ function onColor(hex){
   var r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);
   return (0.299*r+0.587*g+0.114*b)>160?'#111':'#fff';
 }
+var ICONS={
+ig:'<svg viewBox="0 0 24 24" aria-hidden="true"><defs><radialGradient id="igg" cx="30%" cy="107%" r="150%"><stop offset="0" stop-color="#fdf497"/><stop offset=".05" stop-color="#fdf497"/><stop offset=".45" stop-color="#fd5949"/><stop offset=".6" stop-color="#d6249f"/><stop offset=".9" stop-color="#285AEB"/></radialGradient></defs><rect width="24" height="24" rx="6" fill="url(#igg)"/><rect x="5.5" y="5.5" width="13" height="13" rx="4" fill="none" stroke="#fff" stroke-width="1.7"/><circle cx="12" cy="12" r="3.2" fill="none" stroke="#fff" stroke-width="1.7"/><circle cx="16.2" cy="7.8" r="1" fill="#fff"/></svg>',
+tt:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#000"/><g transform="translate(2.4 3) scale(.8)"><path id="ttn" d="M16.6 5.6c-.7-.6-1.1-1.5-1.1-2.5h-2.6v11.1c0 1.2-1 2.2-2.2 2.2s-2.2-1-2.2-2.2 1-2.2 2.2-2.2c.2 0 .5 0 .7.1V9.4c-.2 0-.5-.1-.7-.1-2.7 0-4.8 2.2-4.8 4.9s2.2 4.9 4.8 4.9 4.9-2.2 4.9-4.9V9.1c1 .7 2.1 1.1 3.3 1.1V7.6c-.9 0-1.7-.7-2.3-2z" fill="#25F4EE" transform="translate(-.7 -.7)"/><path d="M16.6 5.6c-.7-.6-1.1-1.5-1.1-2.5h-2.6v11.1c0 1.2-1 2.2-2.2 2.2s-2.2-1-2.2-2.2 1-2.2 2.2-2.2c.2 0 .5 0 .7.1V9.4c-.2 0-.5-.1-.7-.1-2.7 0-4.8 2.2-4.8 4.9s2.2 4.9 4.8 4.9 4.9-2.2 4.9-4.9V9.1c1 .7 2.1 1.1 3.3 1.1V7.6c-.9 0-1.7-.7-2.3-2z" fill="#FE2C55" transform="translate(.7 .7)"/><path d="M16.6 5.6c-.7-.6-1.1-1.5-1.1-2.5h-2.6v11.1c0 1.2-1 2.2-2.2 2.2s-2.2-1-2.2-2.2 1-2.2 2.2-2.2c.2 0 .5 0 .7.1V9.4c-.2 0-.5-.1-.7-.1-2.7 0-4.8 2.2-4.8 4.9s2.2 4.9 4.8 4.9 4.9-2.2 4.9-4.9V9.1c1 .7 2.1 1.1 3.3 1.1V7.6c-.9 0-1.7-.7-2.3-2z" fill="#fff"/></g></svg>',
+fb:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path d="M13.5 20v-6.5h2.2l.4-2.7h-2.6V9.1c0-.8.3-1.3 1.4-1.3h1.3V5.4c-.2 0-1-.1-1.9-.1-2 0-3.3 1.2-3.3 3.4v1.9H8.8v2.7H11V20z" fill="#fff"/></svg>',
+wa:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#25D366"/><path d="M12 5a7 7 0 0 0-6 10.6L5 19l3.500-.9A7 7 0 1 0 12 5z" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.300 8.800c.2-.4.4-.4.600-.4h.4c.1 0 .3 0 .4.300l.600 1.400c0 .2 0 .3-.1.400l-.4.500c-.1.1-.1.200 0 .400.4.700 1.300 1.600 2.200 2 .2.100.3.100.4 0l.6-.7c.1-.1.3-.2.5-.1l1.400.7c.2.1.3.2.3.3 0 .5-.2 1.100-.8 1.400-.5.300-1.100.4-1.800.2-1.800-.5-3.200-1.600-4.200-3.100-.6-.9-.9-1.800-.6-2.700z" fill="#fff"/></svg>',
+web:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#4285F4"/><g fill="none" stroke="#fff" stroke-width="1.5"><circle cx="12" cy="12" r="7"/><ellipse cx="12" cy="12" rx="3" ry="7"/><path d="M5 12h14"/></g></svg>',
+mp:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="12" fill="#fff"/><path d="M12 2.500a6.500 6.500 0 0 0-6.500 6.500c0 4.700 6.500 12.500 6.500 12.500s6.500-7.800 6.500-12.500A6.500 6.500 0 0 0 12 2.500z" fill="#EA4335"/><circle cx="12" cy="9" r="2.500" fill="#fff"/></svg>',
+ph:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#34C759"/><path d="M8 6.500l2-.6 1.200 2.900-1.300 1c.7 1.500 1.800 2.600 3.300 3.300l1-1.300 2.900 1.200-.6 2c-.2.700-.9 1.100-1.600 1C9.800 15.500 7.700 13.300 6.900 8.100c-.1-.7.300-1.400 1.100-1.600z" fill="#fff"/></svg>'
+};
 function render(cfg,el,live){
   var ac=cfg.c||'#d4382c';
   el.style.setProperty('--ac',ac);
   el.style.setProperty('--on',onColor(ac));
-  var rows=[['ig','Instagram','IG'],['tt','TikTok','TT'],['fb','Facebook','FB'],['wa','WhatsApp','WA'],['web','Sitio web','WW'],['mp','Cómo llegar','GO'],['ph','Llamar','TL']];
+  el.style.background=ac;
+  var rows=[['ig','Instagram'],['tt','TikTok'],['fb','Facebook'],['wa','WhatsApp'],['web','Sitio web'],['mp','Cómo llegar'],['ph','Llamar']];
+  var G='<span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC04">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span>';
   var h='<div class="pg"><h2>'+esc(cfg.n||'Nombre del negocio')+'</h2><p class="t">'+esc(cfg.t||'Gracias por visitarnos')+'</p>';
   var g=link('g',cfg.g);
-  if(g) h+='<a class="cta" href="'+esc(g)+'"><i aria-hidden="true">★★★★★</i><b>Déjanos tu reseña en Google</b><small>Toma menos de un minuto</small></a>';
+  if(g) h+='<a class="cta" href="'+esc(g)+'"><i aria-hidden="true">★★★★★</i><b>Déjanos tu reseña en '+G+'</b><small>Toma menos de un minuto</small></a>';
   rows.forEach(function(r){
     var u=link(r[0],cfg[r[0]]);
-    if(u) h+='<a class="lk" href="'+esc(u)+'"><em aria-hidden="true">'+r[2]+'</em><span>'+r[1]+'</span></a>';
+    if(u) h+='<a class="lk" href="'+esc(u)+'">'+ICONS[r[0]]+'<span>'+r[1]+'</span></a>';
   });
   el.innerHTML=h+'</div>';
-  if(!live && cfg.gc){
-    var s=document.createElement('script');
-    s.async=true;s.src='https://gc.zgo.at/count.js';
-    s.setAttribute('data-goatcounter','https://'+cfg.gc.replace(/[^a-z0-9-]/gi,'')+'.goatcounter.com/count');
-    document.head.appendChild(s);
+  if(!live){
+    document.body.style.background=ac;
+    el.style.minHeight='100vh';
+    if(cfg.gc){
+      var s=document.createElement('script');
+      s.async=true;s.src='https://gc.zgo.at/count.js';
+      s.setAttribute('data-goatcounter','https://'+cfg.gc.replace(/[^a-z0-9-]/gi,'')+'.goatcounter.com/count');
+      document.head.appendChild(s);
+    }
   }
 }
 
@@ -158,6 +187,10 @@ var timer;
 function update(){
   var o=read();
   render(o,$('#pv'),true);
+  var gl=link('g',o.g);
+  $('#gbox').hidden=!gl;
+  $('#gout').textContent=gl;
+  if(gl) $('#gts').href=gl;
   clearTimeout(timer);
   timer=setTimeout(function(){
     var fu=$('#fu').value.trim();
@@ -187,6 +220,10 @@ $('#bsh').onclick=function(){
   var u=demoLink(read());
   if(navigator.share){navigator.share({title:read().n||'Página',url:u}).catch(function(){});}
   else{window.prompt('Copia el link:',u);}
+};
+$('#gcp').onclick=function(){
+  var u=$('#gout').textContent;
+  (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){msg('Link de reseñas copiado.');},function(){window.prompt('Copia el link:',u);});
 };
 $('#bqr').onclick=function(){
   var img=$('#qrbox img'); if(!img) return;
